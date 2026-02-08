@@ -1,22 +1,29 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
 
 const PhantomContext = createContext(null);
 
 export const usePhantom = () => {
   const context = useContext(PhantomContext);
-  if (!context) {
-    throw new Error('usePhantom must be used within PhantomProvider');
-  }
+  if (!context) throw new Error('usePhantom must be used within PhantomProvider');
   return context;
+};
+
+const HELIUS_RPC = import.meta.env.VITE_HELIUS_RPC_URL || 'https://api.mainnet-beta.solana.com';
+
+const rpcCall = async (method, params) => {
+  const res = await fetch(HELIUS_RPC, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+  });
+  const data = await res.json();
+  return data.result;
 };
 
 const getProvider = () => {
   if ('phantom' in window) {
     const provider = window.phantom?.solana;
-    if (provider?.isPhantom) {
-      return provider;
-    }
+    if (provider?.isPhantom) return provider;
   }
   return null;
 };
@@ -28,70 +35,43 @@ export const PhantomProvider = ({ children }) => {
   const [connecting, setConnecting] = useState(false);
   const [balance, setBalance] = useState(0);
 
-  const connection = new Connection(
-    import.meta.env.VITE_HELIUS_RPC_URL || clusterApiUrl('mainnet-beta'),
-    'confirmed'
-  );
-
   const fetchBalance = useCallback(async (pubKey) => {
     try {
-      const bal = await connection.getBalance(new PublicKey(pubKey.toString()));
-      setBalance(bal / 1e9);
-    } catch (error) {
-      console.error('Error fetching balance:', error);
+      const result = await rpcCall('getBalance', [pubKey.toString()]);
+      setBalance((result?.value || 0) / 1e9);
+    } catch (e) {
+      console.error('Balance error:', e);
     }
-  }, [connection]);
+  }, []);
 
   useEffect(() => {
-    const phantomProvider = getProvider();
-    if (phantomProvider) {
-      setProvider(phantomProvider);
-
-      phantomProvider.on('connect', (pubKey) => {
-        setPublicKey(pubKey);
+    const p = getProvider();
+    if (p) {
+      setProvider(p);
+      p.on('connect', (pk) => { setPublicKey(pk); setConnected(true); fetchBalance(pk); });
+      p.on('disconnect', () => { setPublicKey(null); setConnected(false); setBalance(0); });
+      p.on('accountChanged', (pk) => {
+        if (pk) { setPublicKey(pk); fetchBalance(pk); }
+        else { setPublicKey(null); setConnected(false); setBalance(0); }
+      });
+      if (p.isConnected && p.publicKey) {
+        setPublicKey(p.publicKey);
         setConnected(true);
-        fetchBalance(pubKey);
-      });
-
-      phantomProvider.on('disconnect', () => {
-        setPublicKey(null);
-        setConnected(false);
-        setBalance(0);
-      });
-
-      phantomProvider.on('accountChanged', (pubKey) => {
-        if (pubKey) {
-          setPublicKey(pubKey);
-          fetchBalance(pubKey);
-        } else {
-          setPublicKey(null);
-          setConnected(false);
-          setBalance(0);
-        }
-      });
-
-      if (phantomProvider.isConnected) {
-        setPublicKey(phantomProvider.publicKey);
-        setConnected(true);
-        fetchBalance(phantomProvider.publicKey);
+        fetchBalance(p.publicKey);
       }
     }
   }, []);
 
   const connect = async () => {
-    if (!provider) {
-      window.open('https://phantom.app/', '_blank');
-      return;
-    }
-
+    if (!provider) { window.open('https://phantom.app/', '_blank'); return; }
     try {
       setConnecting(true);
-      const response = await provider.connect();
-      setPublicKey(response.publicKey);
+      const resp = await provider.connect();
+      setPublicKey(resp.publicKey);
       setConnected(true);
-      await fetchBalance(response.publicKey);
-    } catch (error) {
-      console.error('Error connecting to Phantom:', error);
+      await fetchBalance(resp.publicKey);
+    } catch (e) {
+      console.error('Connect error:', e);
     } finally {
       setConnecting(false);
     }
@@ -99,43 +79,17 @@ export const PhantomProvider = ({ children }) => {
 
   const disconnect = async () => {
     if (provider) {
-      try {
-        await provider.disconnect();
-        setPublicKey(null);
-        setConnected(false);
-        setBalance(0);
-      } catch (error) {
-        console.error('Error disconnecting:', error);
-      }
+      await provider.disconnect();
+      setPublicKey(null); setConnected(false); setBalance(0);
     }
   };
 
-  const signTransaction = async (transaction) => {
-    if (!provider || !connected) throw new Error('Wallet not connected');
-    return await provider.signTransaction(transaction);
-  };
-
-  const signAndSendTransaction = async (transaction) => {
-    if (!provider || !connected) throw new Error('Wallet not connected');
-    return await provider.signAndSendTransaction(transaction);
-  };
-
-  const value = {
-    provider,
-    publicKey,
-    connected,
-    connecting,
-    balance,
-    connection,
-    connect,
-    disconnect,
-    signTransaction,
-    signAndSendTransaction,
-    refreshBalance: () => publicKey && fetchBalance(publicKey),
-  };
-
   return (
-    <PhantomContext.Provider value={value}>
+    <PhantomContext.Provider value={{
+      provider, publicKey, connected, connecting, balance,
+      connect, disconnect, rpcCall,
+      refreshBalance: () => publicKey && fetchBalance(publicKey),
+    }}>
       {children}
     </PhantomContext.Provider>
   );

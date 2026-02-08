@@ -1,16 +1,8 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  define: {
-    'process.env': {},
-    global: 'globalThis',
-  },
-  resolve: {
-    alias: {
-      buffer: 'buffer',
-    },
+  esbuild: {
+    jsxInject: `import React from 'react'`,
+    jsx: 'automatic',
   },
 })

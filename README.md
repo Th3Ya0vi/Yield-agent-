@@ -1,39 +1,48 @@
-# 🤖 YieldAgent — AI-Powered Stablecoin Yields on Solana
+# ⚡ YieldAgent — AI-Powered Stablecoin Yields on Solana
 
 **Stake any token. Earn USDC. Let AI do the work.**
 
-YieldAgent is an autonomous AI-powered yield optimization platform on Solana. Connect your Phantom wallet, deposit any SPL token, and let our AI agent find the best yield strategies across Solana DeFi — with all returns paid out in USDC.
+YieldAgent is an autonomous AI agent that optimizes DeFi yields on Solana. Connect your Phantom wallet, deposit any token, and the AI agent finds the best yield strategies across Solana protocols — with all earnings paid out in USDC.
 
 ## 🏆 Colosseum Agent Hackathon Entry
 
-- **Agent:** nicco (#914)
+Built by **Nicco** (Agent #914) for the [Colosseum Agent Hackathon](https://colosseum.com/agent-hackathon/) — the world's first hackathon built for AI agents.
+
 
 ## ✨ Features
 
-- **🔗 Phantom Connect** — Sign in with Google/Apple or browser extension. Zero-friction onboarding.
-- **💰 Any Token → USDC Yields** — Deposit SOL, mSOL, JitoSOL, USDT, or any SPL token and earn yields in stablecoins.
-- **🧠 AI Strategy Engine** — Autonomous agent analyzes yield opportunities across Jupiter, Kamino, Marinade, Raydium, Drift, and more.
-- **⚡ Real-time Rebalancing** — 24/7 monitoring and automatic portfolio rebalancing for maximum returns.
-- **💬 Chat Interface** — Talk to the AI agent. Ask about strategies, earnings, or risk levels.
-- **🔒 Non-custodial** — Your funds stay in your wallet. All transactions require your approval.
+- **🔗 Phantom Connect** — One-click wallet connection with social login (Google/Apple) or browser extension
+- **📊 Any Token → USDC Yields** — Deposit any SPL token, earn yields paid in stablecoins
+- **🤖 AI Yield Optimizer** — Autonomous agent finds the best rates across DeFi protocols
+- **⚡ Solana-Native** — Fast, cheap, composable. Built on Helius RPC
+- **💬 Chat Interface** — Talk to the AI agent about strategies, risk, and portfolio management
+- **🔄 Auto-Rebalancing** — Agent monitors and rebalances positions 24/7
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Phantom SDK   │────▶│   React Frontend │────▶│   AI Agent      │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-                               │                         │
-                               ▼                         ▼
-                        ┌──────────────┐          ┌──────────────┐
-                        │  Helius RPC  │          │  DeFi Protos │
-                        │  (Solana)    │          │  Jupiter     │
-                        └──────────────┘          │  Kamino      │
-                                                  │  Marinade    │
-                                                  │  Raydium     │
-                                                  │  Drift       │
-                                                  └──────────────┘
+User ← Phantom Connect → YieldAgent Frontend
+                              ↓
+                        AI Strategy Engine
+                              ↓
+                    ┌─────────┼─────────┐
+                    ↓         ↓         ↓
+              Marinade    Jupiter    Kamino
+              (Staking)   (Swaps)   (Lending)
+                    ↓         ↓         ↓
+                    └─────────┼─────────┘
+                              ↓
+                     USDC Yield Payouts
 ```
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React + Vite + Tailwind CSS v4
+- **Wallet**: Phantom Connect SDK (embedded wallets + extension)
+- **RPC**: Helius (mainnet)
+- **DeFi**: Jupiter (swaps), Kamino (lending), Marinade (staking), Raydium (LP)
+
+- **Prices**: Jupiter Price API v2
 
 ## 🚀 Quick Start
 
@@ -45,55 +54,35 @@ cd Yield-agent-
 # Install dependencies
 npm install
 
-# Set up environment variables
+# Set up environment
 cp .env.example .env
 # Edit .env with your Phantom App ID and Helius RPC URL
 
-# Run development server
+# Run dev server
 npm run dev
 ```
 
-## ⚙️ Environment Variables
+## 📝 Environment Variables
 
 ```env
 VITE_PHANTOM_APP_ID=your-phantom-app-id
 VITE_HELIUS_RPC_URL=https://mainnet.helius-rpc.com/?api-key=your-key
 ```
 
-## 🧰 Tech Stack
+## 🔒 Yield Strategies
 
-- **Frontend:** React + Vite + Tailwind CSS v4
-- **Wallet:** Phantom Connect SDK (embedded wallets + extension)
-- **Blockchain:** Solana (Mainnet) via Helius RPC
-- **Swaps:** Jupiter Aggregator v6
+| Token | Protocol | Type | Est. APY | Risk |
+|-------|----------|------|----------|------|
+| SOL | Jito | MEV Staking | 8.1% | Low |
+| SOL | Marinade | Liquid Staking | 7.2% | Low |
+| USDC | Kamino | Lending | 6.2% | Low |
+| USDC | Drift | LP | 12.5% | Medium |
+| mSOL | Marinade Vaults | Auto-compound | 7.8% | Low |
 
-- **Yield Sources:** Marinade, Jito, Kamino, Solend, Drift, Raydium
-
-## 💡 How It Works
-
-1. **Connect** — User connects Phantom wallet (social login or extension)
-2. **Analyze** — AI agent scans your token holdings and finds optimal yield strategies
-3. **Deposit** — Select a token, choose amount, approve transaction
-4. **Earn** — AI automatically routes to highest-yield protocols
-5. **Harvest** — Yields are auto-converted to USDC via Jupiter swaps
-6. **Rebalance** — Agent continuously monitors and rebalances for maximum returns
-
-## 📊 Yield Strategies
-
-| Strategy | Protocol | Typical APY | Risk |
-|----------|----------|-------------|------|
-| SOL Liquid Staking | Marinade | 7.2% | Low |
-| SOL MEV Staking | Jito | 8.1% | Low |
-| USDC Lending | Kamino | 6.2% | Low |
-| USDC LP | Drift Protocol | 12.5% | Medium |
-| SOL Lending | Solend | 3.5% | Low |
-
-## 🤝 Built With
-
-- [Phantom](https://phantom.app) — Solana Wallet
-- [Helius](https://helius.dev) — Solana RPC & Infrastructure
-- [Jupiter](https://jup.ag) — DEX Aggregator
-
-## 📄 License
+## 📜 License
 
 MIT
+
+---
+
+*Built autonomously by an AI agent. The future is here.* 🤖⚡
