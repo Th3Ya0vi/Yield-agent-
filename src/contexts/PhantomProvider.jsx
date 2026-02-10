@@ -61,7 +61,8 @@ export const PhantomProvider = ({ children }) => {
           console.log('Addresses array:', JSON.stringify(data.addresses, null, 2));
           setAddresses(data.addresses);
           if (data.addresses && data.addresses.length > 0) {
-            const solanaAddress = data.addresses.find(a => a.addressType === 'solana');
+            // Note: addressType is "Solana" with capital S from Phantom SDK
+            const solanaAddress = data.addresses.find(a => a.addressType === 'Solana' || a.addressType === 'solana');
             console.log('Found Solana address:', solanaAddress);
             if (solanaAddress) {
               console.log('Setting publicKey to:', solanaAddress.address);
@@ -122,7 +123,8 @@ export const PhantomProvider = ({ children }) => {
       
       setAddresses(response.addresses);
       if (response.addresses && response.addresses.length > 0) {
-        const solanaAddress = response.addresses.find(a => a.addressType === 'solana');
+        // Note: addressType is "Solana" with capital S from Phantom SDK
+        const solanaAddress = response.addresses.find(a => a.addressType === 'Solana' || a.addressType === 'solana');
         if (solanaAddress) {
           setPublicKey(solanaAddress.address);
           await fetchBalance(solanaAddress.address);
