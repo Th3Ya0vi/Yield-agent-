@@ -51,6 +51,11 @@ export const PhantomProvider = ({ children }) => {
         });
 
         // Set up event listeners
+        phantomSDK.on('connect_start', (data) => {
+          console.log('Phantom Connect: starting...', data);
+          setConnecting(true);
+        });
+
         phantomSDK.on('connect', (data) => {
           console.log('Phantom Connect: connected', data);
           setAddresses(data.addresses);
@@ -62,6 +67,7 @@ export const PhantomProvider = ({ children }) => {
             }
           }
           setConnected(true);
+          setConnecting(false);
         });
 
         phantomSDK.on('disconnect', () => {
@@ -79,29 +85,14 @@ export const PhantomProvider = ({ children }) => {
 
         setSdk(phantomSDK);
 
-        // Check if already connected (after OAuth redirect or page refresh)
-        const checkConnection = async () => {
-          try {
-            const isConnected = await phantomSDK.isConnected();
-            if (isConnected) {
-              const sessionData = await phantomSDK.getSession();
-              console.log('Found existing session:', sessionData);
-              if (sessionData?.addresses) {
-                setAddresses(sessionData.addresses);
-                const solanaAddress = sessionData.addresses.find(a => a.addressType === 'solana');
-                if (solanaAddress) {
-                  setPublicKey(solanaAddress.address);
-                  fetchBalance(solanaAddress.address);
-                }
-                setConnected(true);
-              }
-            }
-          } catch (error) {
-            console.log('No existing session:', error);
-          }
-        };
-
-        checkConnection();
+        // Auto-connect to existing session (crucial for OAuth redirect callback)
+        try {
+          console.log('Attempting auto-connect...');
+          await phantomSDK.autoConnect();
+          console.log('Auto-connect completed');
+        } catch (error) {
+          console.log('No existing session to auto-connect:', error);
+        }
       } catch (error) {
         console.error('Failed to initialize Phantom Connect SDK:', error);
       }
