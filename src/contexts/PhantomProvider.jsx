@@ -47,7 +47,7 @@ export const PhantomProvider = ({ children }) => {
           providers: ['google', 'apple', 'injected'], // Support social login + extension
           addressTypes: [AddressType.solana],
           appId: PHANTOM_APP_ID,
-          autoConnect: false, // We'll handle connect manually
+          autoConnect: true, // Auto-reconnect after OAuth redirect
         });
 
         // Set up event listeners
@@ -78,6 +78,30 @@ export const PhantomProvider = ({ children }) => {
         });
 
         setSdk(phantomSDK);
+
+        // Check if already connected (after OAuth redirect or page refresh)
+        const checkConnection = async () => {
+          try {
+            const isConnected = await phantomSDK.isConnected();
+            if (isConnected) {
+              const sessionData = await phantomSDK.getSession();
+              console.log('Found existing session:', sessionData);
+              if (sessionData?.addresses) {
+                setAddresses(sessionData.addresses);
+                const solanaAddress = sessionData.addresses.find(a => a.addressType === 'solana');
+                if (solanaAddress) {
+                  setPublicKey(solanaAddress.address);
+                  fetchBalance(solanaAddress.address);
+                }
+                setConnected(true);
+              }
+            }
+          } catch (error) {
+            console.log('No existing session:', error);
+          }
+        };
+
+        checkConnection();
       } catch (error) {
         console.error('Failed to initialize Phantom Connect SDK:', error);
       }
