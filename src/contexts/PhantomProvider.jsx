@@ -58,12 +58,17 @@ export const PhantomProvider = ({ children }) => {
 
         phantomSDK.on('connect', (data) => {
           console.log('Phantom Connect: connected', data);
+          console.log('Addresses array:', JSON.stringify(data.addresses, null, 2));
           setAddresses(data.addresses);
           if (data.addresses && data.addresses.length > 0) {
             const solanaAddress = data.addresses.find(a => a.addressType === 'solana');
+            console.log('Found Solana address:', solanaAddress);
             if (solanaAddress) {
+              console.log('Setting publicKey to:', solanaAddress.address);
               setPublicKey(solanaAddress.address);
               fetchBalance(solanaAddress.address);
+            } else {
+              console.error('No Solana address found in addresses array!');
             }
           }
           setConnected(true);
