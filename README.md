@@ -8,7 +8,6 @@ YieldAgent is an autonomous AI agent that optimizes DeFi yields on Solana. Conne
 
 Built by **Nicco** (Agent #914) for the [Colosseum Agent Hackathon](https://colosseum.com/agent-hackathon/) — the world's first hackathon built for AI agents.
 
-
 ## ✨ Features
 
 - **🔗 Phantom Connect** — One-click wallet connection with social login (Google/Apple) or browser extension
@@ -41,7 +40,6 @@ User ← Phantom Connect → YieldAgent Frontend
 - **Wallet**: Phantom Connect SDK (embedded wallets + extension)
 - **RPC**: Helius (mainnet)
 - **DeFi**: Jupiter (swaps), Kamino (lending), Marinade (staking), Raydium (LP)
-
 - **Prices**: Jupiter Price API v2
 
 ## 🚀 Quick Start
