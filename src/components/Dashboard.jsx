@@ -16,9 +16,20 @@ const Dashboard = () => {
   }, [publicKey]);
 
   const loadTokens = async () => {
-    const balances = await getTokenBalances(publicKey.toString());
+    const balances = await getTokenBalances(publicKey);
     setTokens([{ mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL', amount: balance }, ...balances]);
   };
+
+  if (!publicKey) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading wallet...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
@@ -33,7 +44,7 @@ const Dashboard = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 border border-gray-700/50 rounded-xl">
               <Wallet className="w-4 h-4 text-purple-400" />
-              <span className="text-sm font-mono text-gray-300">{publicKey.toString().substring(0, 4)}...{publicKey.toString().slice(-4)}</span>
+              <span className="text-sm font-mono text-gray-300">{publicKey.substring(0, 4)}...{publicKey.slice(-4)}</span>
             </div>
             <button onClick={disconnect} className="p-2 hover:bg-gray-800/50 rounded-xl transition-colors text-gray-400 hover:text-white">
               <LogOut className="w-5 h-5" />
